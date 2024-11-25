@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using StargateAPI.Business.Commands;
 using StargateAPI.Business.Data;
 using StargateAPI.Business.Dtos;
+using StargateAPI.Business.Providers;
 using System.Text.Json;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -23,24 +24,22 @@ builder.Services.AddSwaggerGen();
 // a much better implementation of this functionality is represented at the following link.
 // Time permitting, I would design and implement accordingly.
 // https://aws.amazon.com/blogs/modernizing-with-aws/how-to-load-net-configuration-from-aws-secrets-manager/
-
 // The following are stored as plain text for now - not a good practice. Should encode/decode to use.
-string? awsKeyId = Environment.GetEnvironmentVariable("AWS_KEY_ID");
-string? aswSecretKeyId = Environment.GetEnvironmentVariable("AWS_SECRET_KEY_ID");
 
-if ((awsKeyId != null) || (aswSecretKeyId == null))
-    throw new Exception("Unable to access.");
 
-var request = new GetSecretValueRequest { SecretId = "MyDbConnectionSecret" };
-var secretsManagerClient = new AmazonSecretsManagerClient(awsKeyId, aswSecretKeyId);
-var response = await secretsManagerClient.GetSecretValueAsync(request);
-var secretString = response.SecretString;
-var secret = JsonSerializer.Deserialize<Dictionary<string, string>>(secretString);
+var secretResponse = await AWSProvider.GetCredentials(
+    new BaseCloudRequest
+    {
+        KeyID = Environment.GetEnvironmentVariable("AWS_KEY_ID"),
+        SecretKeyId = Environment.GetEnvironmentVariable("AWS_SECRET_KEY_ID"),
+        CredentialsLabel = Environment.GetEnvironmentVariable("AWS_DB_CREDENTIALS_LABEL")
+    }
+ );
 
-// </end poor coding>
-
+// Build
+string connectionString = String.Format(builder.Configuration.GetConnectionString("StarbaseApiDatabase"), secretResponse.Host, secretResponse.DBInstanceIdentifier, secretResponse.UserName, secretResponse.Password);
 builder.Services.AddDbContext<StargateContext>(options => 
-    options.UseSqlServer(builder.Configuration.GetConnectionString("StarbaseApiDatabase")));
+    options.UseSqlServer(connectionString));
 
 builder.Services.AddMediatR(cfg =>
 {
