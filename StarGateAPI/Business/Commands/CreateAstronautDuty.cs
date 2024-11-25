@@ -3,7 +3,7 @@ using MediatR;
 using MediatR.Pipeline;
 using Microsoft.EntityFrameworkCore;
 using StargateAPI.Business.Data;
-using StargateAPI.Controllers;
+using StargateAPI.Business.Dtos;
 using System.Net;
 
 namespace StargateAPI.Business.Commands

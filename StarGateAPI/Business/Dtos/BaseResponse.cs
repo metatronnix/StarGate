@@ -1,6 +1,6 @@
 ﻿using System.Net;
 
-namespace StargateAPI.Controllers
+namespace StargateAPI.Business.Dtos
 {
     public class BaseResponse
     {
