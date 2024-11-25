@@ -1,6 +1,4 @@
-﻿using StargateAPI.Business.Providers;
-
-namespace StargateAPI.Business.Configuration
+﻿namespace StargateAPI.Business.Configuration
 {
     public class AmazonSecretsManagerConfigurationSource : IConfigurationSource
     {

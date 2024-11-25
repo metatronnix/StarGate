@@ -3,7 +3,7 @@ using Amazon.SecretsManager;
 using System.Text.Json;
 using Amazon;
 
-namespace StargateAPI.Business.Providers
+namespace StargateAPI.Business.Configuration
 {
     public class AmazonSecretsManagerConfigurationProvider : ConfigurationProvider
     {
@@ -20,7 +20,7 @@ namespace StargateAPI.Business.Providers
         {
             var secret = GetSecret();
 
-            if (secret  != null) 
+            if (secret != null)
                 Data = JsonSerializer.Deserialize<Dictionary<string, string>>(secret);
         }
 
